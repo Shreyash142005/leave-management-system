@@ -237,7 +237,8 @@ public class LeaveRequestService {
 
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
         // Notify all managers of the same department
-       List<User> managers = userRepository.findByRole(Role.MANAGER);
+       Page<User> managerPage = userRepository.findByRole(Role.MANAGER, Pageable.unpaged());
+        List<User> managers = managerPage.getContent();;
 
 for (User manager : managers) {
     Employee managerEmployee = employeeService.getEmployeeByUserId(manager.getId());
@@ -414,6 +415,7 @@ for (User manager : managers) {
     }
 
 }
+
 
 
 
