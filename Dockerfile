@@ -1,20 +1,18 @@
-# Use official OpenJDK 17 image
-FROM eclipse-temurin:17-jdk
+FROM maven:3.9.6-eclipse-temurin-17
 
-# Set working directory
 WORKDIR /app
 
-# Copy all project files
-COPY . .
+COPY pom.xml .
+COPY src ./src
 
-# Give permission to mvnw
-RUN chmod +x mvnw
+RUN mvn clean package -DskipTests
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+FROM eclipse-temurin:17-jdk
 
-# Expose the port (Render will use PORT env variable)
+WORKDIR /app
+
+COPY --from=0 /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the generated jar file
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "app.jar"]
