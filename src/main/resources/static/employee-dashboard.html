@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Leave Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <h2>🏢 Leave Management</h2>
+        </div>
+        <div class="nav-user">
+            <span id="user-name">Welcome, Employee</span>
+            <button onclick="logout()" class="btn btn-secondary btn-sm">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Leave Balance Card -->
+    <div class="balance-section">
+        <div class="balance-card">
+            <h3>Leave Balance</h3>
+            <div class="balance-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total Entitlement</div>
+                    <div class="stat-value" id="total-entitlement">24.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Used Leaves</div>
+                    <div class="stat-value used" id="used-leaves">0.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Remaining Leaves</div>
+                    <div class="stat-value remaining" id="remaining-leaves">24.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Carried Forward</div>
+                    <div class="stat-value" id="carried-forward">0.0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('apply')">Apply Leave</button>
+        <button class="tab-btn" onclick="showTab('my-leaves')">My Leaves</button>
+        <button class="tab-btn" onclick="showTab('holidays')">Holidays</button>
+        <button class="tab-btn" onclick="showTab('year-end')">Year-End Settlement</button>
+    </div>
+
+    <!-- Apply Leave Tab -->
+    <div id="apply-tab" class="tab-content active">
+        <div class="card">
+            <h2 id="form-title">Apply for Leave</h2>
+            <form id="leave-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">Start Date *</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">End Date *</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Duration *</label>
+                        <select id="duration" required onchange="toggleHalfDayOptions()">
+                            <option value="FULL_DAY">Full Day</option>
+                            <option value="HALF_DAY">Half Day</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="half-day-type-group" style="display: none;">
+                        <label for="halfDayType">Half Day Type *</label>
+                        <select id="halfDayType">
+                            <option value="">Select Type</option>
+                            <option value="FIRST_HALF">First Half (Morning)</option>
+                            <option value="SECOND_HALF">Second Half (Afternoon)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reason">Reason *</label>
+                    <textarea id="reason" rows="3" required placeholder="Enter reason for leave..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+            </form>
+
+            <div id="apply-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- My Leaves Tab -->
+    <div id="my-leaves-tab" class="tab-content">
+        <div class="card">
+            <h2>My Leave Requests</h2>
+
+            <div class="filters">
+                <select id="sort-by" onchange="loadMyLeaves()">
+                    <option value="createdAt">Sort by Applied Date</option>
+                    <option value="startDate">Sort by Start Date</option>
+                    <option value="workingDays">Sort by Duration</option>
+                </select>
+
+                <button onclick="loadMyLeaves()" class="btn btn-secondary">🔄 Refresh</button>
+            </div>
+
+            <div id="leaves-container">
+                <p class="loading">Loading leaves...</p>
+            </div>
+
+            <div class="pagination">
+                <button id="prev-btn" onclick="previousPage()" class="btn btn-secondary">Previous</button>
+                <span id="page-info">Page 1</span>
+                <button id="next-btn" onclick="nextPage()" class="btn btn-secondary">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holidays Tab -->
+    <div id="holidays-tab" class="tab-content">
+        <div class="card">
+            <h2>Festival Holidays</h2>
+
+            <div class="filters">
+                <select id="holiday-year" onchange="loadHolidays()">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+                <button onclick="loadHolidays()" class="btn btn-secondary">🔄 Refresh</button>
+            </div>
+
+            <div id="holidays-container">
+                <p class="loading">Loading holidays...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Year-End Settlement Tab -->
+    <div id="year-end-tab" class="tab-content">
+        <div class="card">
+            <h2>Year-End Leave Settlement</h2>
+            <p class="info-text">Choose how to handle your unused leaves at year-end. You can only choose ONE option.</p>
+
+            <div class="year-end-options">
+                <div class="year-end-option">
+                    <h3>🔄 Carry Forward</h3>
+                    <p>Carry forward unused leaves to next year (Maximum: 12 leaves)</p>
+                    <button onclick="processYearEnd('CARRY_FORWARD')" class="btn btn-primary">
+                        Choose Carry Forward
+                    </button>
+                </div>
+
+                <div class="year-end-option">
+                    <h3>💰 Encashment</h3>
+                    <p>Convert unused leaves to cash (Maximum: 10 leaves)</p>
+                    <button onclick="processYearEnd('ENCASHMENT')" class="btn btn-success">
+                        Choose Encashment
+                    </button>
+                </div>
+            </div>
+
+            <div id="year-end-message" class="message"></div>
+        </div>
+    </div>
+</div>
+
+<script src="common.js"></script>
+<script src="employee.js"></script>
+</body>
+</html>

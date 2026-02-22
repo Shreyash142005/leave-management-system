@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Management System - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .role-card {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .role-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .role-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+
+        .role-card .role-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .role-card .role-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .role-card .role-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 0;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .auth-tab:hover {
+            color: #667eea;
+        }
+
+        .auth-tab.active {
+            color: #667eea;
+        }
+
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .auth-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .demo-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .demo-account {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="login-body">
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>🏢 Leave Management System</h1>
+            <p>Welcome! Please sign in or create an account</p>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="showAuthTab('login')">Sign In</button>
+            <button class="auth-tab" onclick="showAuthTab('register')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-content" class="auth-content active">
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <div class="role-card selected" onclick="selectRole('EMPLOYEE')" id="role-employee">
+                    <div class="role-icon">👤</div>
+                    <div class="role-name">Employee</div>
+                    <div class="role-desc">Apply & manage leaves</div>
+                </div>
+                <div class="role-card" onclick="selectRole('MANAGER')" id="role-manager">
+                    <div class="role-icon">👔</div>
+                    <div class="role-name">Manager</div>
+                    <div class="role-desc">Approve team requests</div>
+                </div>
+                <div class="role-card" onclick="selectRole('ADMIN')" id="role-admin">
+                    <div class="role-icon">⚙️</div>
+                    <div class="role-name">Admin</div>
+                    <div class="role-desc">System administration</div>
+                </div>
+            </div>
+
+            <form id="login-form" class="login-form">
+                <input type="hidden" id="login-role" value="EMPLOYEE">
+
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" name="username" required placeholder="Enter your username" autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" name="password" required placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span id="login-text">Sign In</span>
+                    <span id="login-spinner" class="spinner" style="display: none;">Signing in...</span>
+                </button>
+
+                <div id="login-error" class="error-message" style="display: none;"></div>
+            </form>
+
+            <div class="demo-accounts">
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px; font-weight: 600;">Demo Accounts:</p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div class="demo-account">
+                        <strong style="color: #667eea;">Admin (Default):</strong> admin / admin123
+                    </div>
+                    <div class="demo-account">
+                        <strong style="color: #667eea;">Employee:</strong> john.doe / password123 (if exists)
+                    </div>
+                </div>
+                <p style="font-size: 0.8rem; color: #999; margin-top: 10px; font-style: italic;">
+                    ⚠️ Only one admin account exists in the system. New admin registration is disabled.
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-content" class="auth-content">
+            <form id="register-form" class="login-form">
+                <div class="form-group">
+                    <label for="reg-username">Username *</label>
+                    <input type="text" id="reg-username" name="username" required
+                           placeholder="Choose a username" minlength="3" maxlength="50">
+                    <small class="help-text">3-50 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Password *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="reg-password" name="password" required
+                               placeholder="Choose a password" minlength="6">
+                        <button type="button" class="password-toggle" onclick="togglePassword('reg-password', this)">
+                            👁️
+                        </button>
+                    </div>
+                    <small class="help-text">Minimum 6 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-confirm-password">Confirm Password *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="reg-confirm-password" name="confirmPassword" required
+                               placeholder="Re-enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('reg-confirm-password', this)">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-name">Full Name *</label>
+                    <input type="text" id="reg-name" name="name" required
+                           placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Email *</label>
+                    <input type="email" id="reg-email" name="email" required
+                           placeholder="Enter your email address">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-department">Department</label>
+                    <select id="reg-department" name="department">
+                        <option value="">Select Department</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Sales">Sales</option>
+                        <option value="HR">Human Resources</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Operations">Operations</option>
+                        <option value="IT">IT</option>
+                        <option value="Customer Support">Customer Support</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-role">Role *</label>
+                    <select id="reg-role" name="role" required>
+                        <option value="EMPLOYEE">Employee</option>
+                        <option value="MANAGER">Manager (Requires Admin Approval)</option>
+                    </select>
+                    <small class="help-text">Select EMPLOYEE for regular users. Managers need admin approval before they can approve/reject leaves. Admin registration is disabled.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span id="register-text">Create Account</span>
+                    <span id="register-spinner" class="spinner" style="display: none;">Creating account...</span>
+                </button>
+
+                <div id="register-error" class="error-message" style="display: none;"></div>
+                <div id="register-success" class="success-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+    let selectedLoginRole = 'EMPLOYEE';
+
+    // Toggle password visibility
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            button.textContent = '👁️';
+        }
+    }
+
+    // Role selection function
+    function selectRole(role) {
+        selectedLoginRole = role;
+        document.getElementById('login-role').value = role;
+
+        // Update UI
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.getElementById(`role-${role.toLowerCase()}`).classList.add('selected');
+    }
+
+    // Tab switching function
+    function showAuthTab(tab) {
+        // Update tab buttons
+        document.querySelectorAll('.auth-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Update content
+        document.querySelectorAll('.auth-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tab + '-content').classList.add('active');
+
+        // Clear error messages
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('register-error').style.display = 'none';
+        document.getElementById('register-success').style.display = 'none';
+    }
+
+    // Check if already logged in
+    if (localStorage.getItem('token')) {
+        const role = localStorage.getItem('role');
+        redirectToDashboard(role);
+    }
+
+    // Login form handler
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        const expectedRole = selectedLoginRole;
+
+        await login(username, password, expectedRole);
+    });
+
+    // Register form handler
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
+        const confirmPassword = document.getElementById('reg-confirm-password').value;
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const department = document.getElementById('reg-department').value;
+        const role = document.getElementById('reg-role').value;
+
+        // Validate password match
+        if (password !== confirmPassword) {
+            showRegisterError('Passwords do not match');
+            return;
+        }
+
+        await register({
+            username,
+            password,
+            name,
+            email,
+            department,
+            role
+        });
+    });
+
+    /**
+     * Login function with role validation
+     */
+    async function login(username, password, expectedRole) {
+        const loginBtn = document.querySelector('#login-form button[type="submit"]');
+        const loginText = document.getElementById('login-text');
+        const loginSpinner = document.getElementById('login-spinner');
+        const errorEl = document.getElementById('login-error');
+
+        // Show loading state
+        loginBtn.disabled = true;
+        loginText.style.display = 'none';
+        loginSpinner.style.display = 'inline';
+        errorEl.style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Validate role matches selected login type
+                if (result.data.role !== expectedRole) {
+                    showLoginError(`Invalid login. This account is registered as ${result.data.role}. Please select the correct role.`);
+                    return;
+                }
+
+                // Check if manager is approved (if role is MANAGER)
+                if (result.data.role === 'MANAGER' && !result.data.isApproved) {
+                    showLoginError('Your manager account is pending admin approval. Please contact the administrator.');
+                    return;
+                }
+
+                // Store authentication data with timestamp
+                localStorage.setItem('token', result.data.token);
+                localStorage.setItem('username', result.data.username);
+                localStorage.setItem('role', result.data.role);
+                localStorage.setItem('loginTime', new Date().getTime().toString());
+
+                if (result.data.employeeId) {
+                    localStorage.setItem('employeeId', result.data.employeeId);
+                    localStorage.setItem('employeeName', result.data.employeeName);
+                }
+
+                // Small delay to ensure localStorage is written
+                setTimeout(() => {
+                    // Redirect based on role
+                    redirectToDashboard(result.data.role);
+                }, 100);
+            } else {
+                showLoginError(result.message || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showLoginError('Network error. Please check your connection and try again.');
+        } finally {
+            // Reset button state
+            loginBtn.disabled = false;
+            loginText.style.display = 'inline';
+            loginSpinner.style.display = 'none';
+        }
+    }
+
+    /**
+     * Register function
+     */
+    async function register(data) {
+        const registerBtn = document.querySelector('#register-form button[type="submit"]');
+        const registerText = document.getElementById('register-text');
+        const registerSpinner = document.getElementById('register-spinner');
+        const errorEl = document.getElementById('register-error');
+        const successEl = document.getElementById('register-success');
+
+        // Show loading state
+        registerBtn.disabled = true;
+        registerText.style.display = 'none';
+        registerSpinner.style.display = 'inline';
+        errorEl.style.display = 'none';
+        successEl.style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                let message = 'Account created successfully!';
+                if (data.role === 'MANAGER') {
+                    message += ' Your account needs admin approval before you can approve/reject leaves. Switching to login...';
+                } else {
+                    message += ' Switching to login...';
+                }
+
+                showRegisterSuccess(message);
+                document.getElementById('register-form').reset();
+
+                // Switch to login tab after 3 seconds
+                setTimeout(() => {
+                    document.querySelectorAll('.auth-tab')[0].click();
+                    // Pre-fill username
+                    document.getElementById('login-username').value = data.username;
+                    document.getElementById('login-password').focus();
+                }, 3000);
+            } else {
+                showRegisterError(result.message || 'Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            showRegisterError('Network error. Please check your connection and try again.');
+        } finally {
+            // Reset button state
+            registerBtn.disabled = false;
+            registerText.style.display = 'inline';
+            registerSpinner.style.display = 'none';
+        }
+    }
+
+    /**
+     * Redirect to appropriate dashboard
+     */
+    function redirectToDashboard(role) {
+        if (role === 'EMPLOYEE') {
+            window.location.href = 'employee-dashboard.html';
+        } else if (role === 'ADMIN' || role === 'MANAGER') {
+            window.location.href = 'admin-dashboard.html';
+        }
+    }
+
+    /**
+     * Show login error message
+     */
+    function showLoginError(message) {
+        const errorEl = document.getElementById('login-error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+
+    /**
+     * Show register error message
+     */
+    function showRegisterError(message) {
+        const errorEl = document.getElementById('register-error');
+        const successEl = document.getElementById('register-success');
+
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        successEl.style.display = 'none';
+    }
+
+    /**
+     * Show register success message
+     */
+    function showRegisterSuccess(message) {
+        const errorEl = document.getElementById('register-error');
+        const successEl = document.getElementById('register-success');
+
+        successEl.textContent = message;
+        successEl.style.display = 'block';
+        errorEl.style.display = 'none';
+    }
+</script>
+</body>
+</html>

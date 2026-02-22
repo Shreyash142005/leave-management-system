@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Leave Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body">
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>🏢 Leave Management System</h1>
+            <p>Sign in to continue</p>
+        </div>
+
+        <form id="login-form" class="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <span id="login-text">Sign In</span>
+                <span id="login-spinner" class="spinner" style="display: none;">Signing in...</span>
+            </button>
+
+            <div id="login-error" class="error-message" style="display: none;"></div>
+        </form>
+
+        <div class="login-footer">
+            <p class="redirect-link">
+                Don't have an account? <a href="register.html">Sign Up</a>
+            </p>
+
+            <p class="demo-credentials">Demo Accounts:</p>
+            <div class="demo-accounts">
+                <div class="demo-account">
+                    <strong>Admin:</strong> admin / admin123
+                </div>
+                <div class="demo-account">
+                    <strong>Employee:</strong> john.doe / password123
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+</body>
+</html>
