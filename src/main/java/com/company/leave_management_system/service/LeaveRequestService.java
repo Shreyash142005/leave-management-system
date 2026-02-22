@@ -132,6 +132,11 @@ public class LeaveRequestService {
         leave.setProcessedBy(currentUser);
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
+        notificationService.createNotification(
+        leave.getEmployee().getUser(),
+        "Your leave request from " + leave.getStartDate() +
+        " to " + leave.getEndDate() + " has been rejected."
+        );
 
         // Send approval email
         emailService.sendLeaveApprovedEmail(updated);
@@ -176,6 +181,10 @@ public class LeaveRequestService {
         leave.setProcessedBy(currentUser);
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
+        notificationService.createNotification(
+        leave.getProcessedBy() != null ? leave.getProcessedBy() : null,
+        currentEmployee.getName() + " has cancelled their leave request."
+        );
 
         // Restore leave balance
         int year = leave.getStartDate().getYear();
@@ -225,6 +234,15 @@ public class LeaveRequestService {
         }
 
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        // Notify all managers of the same department
+        List<User> managers = userRepository.findByRole(Role.MANAGER);
+        
+        for (User manager : managers) {
+            notificationService.createNotification(
+                    manager,
+                    "New leave request submitted by " + employee.getName()
+            );
+        }
         emailService.sendLeaveAppliedEmail(saved);
 
         return mapToResponseDTO(saved);
@@ -285,6 +303,11 @@ public class LeaveRequestService {
 
         leave.setStatus(LeaveStatus.CANCELLED);
         LeaveRequest updated = leaveRequestRepository.save(leave);
+        notificationService.createNotification(
+        leave.getEmployee().getUser(),
+        "Your leave request from " + leave.getStartDate() +
+        " to " + leave.getEndDate() + " has been approved."
+        );
 
         int year = leave.getStartDate().getYear();
         leaveBalanceService.restoreLeave(leave.getEmployee().getId(), leave.getWorkingDays(), year);
@@ -381,3 +404,4 @@ public class LeaveRequestService {
     }
 
 }
+
