@@ -21,6 +21,7 @@ public class ManagerApprovalService {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final EmailService emailService; // NEW: Inject email service
+    private final NotificationService notificationService;
 
     /**
      * Get pending managers (not approved yet)
@@ -64,6 +65,10 @@ public class ManagerApprovalService {
         manager.setApprovedBy(adminUsername);
         manager.setApprovedAt(LocalDateTime.now());
         userRepository.save(manager);
+        notificationService.createNotification(
+        manager,
+        "Your manager account has been approved by admin: " + adminUsername
+            );
 
         // NEW: Send approval email to manager
         employeeRepository.findByUserId(manager.getId()).ifPresent(employee -> {
@@ -91,6 +96,10 @@ public class ManagerApprovalService {
         manager.setApprovedBy(null);
         manager.setApprovedAt(null);
         userRepository.save(manager);
+        notificationService.createNotification(
+        manager,
+        "Your manager approval has been revoked by admin."
+);
     }
 
     /**
@@ -114,4 +123,5 @@ public class ManagerApprovalService {
 
         return dto;
     }
+
 }
