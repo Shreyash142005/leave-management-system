@@ -1,6 +1,6 @@
 // register.js - Registration logic
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = '/api';
 
 // Check if already logged in
 if (localStorage.getItem('token')) {
@@ -119,4 +119,5 @@ function showSuccess(message) {
     successEl.textContent = message;
     successEl.style.display = 'block';
     errorEl.style.display = 'none';
+
 }
