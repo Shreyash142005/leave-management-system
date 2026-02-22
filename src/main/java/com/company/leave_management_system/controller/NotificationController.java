@@ -1,9 +1,9 @@
 package com.company.leave_management_system.controller;
 
 import com.company.leave_management_system.entity.Notification;
-import com.company.leave_management_system.entity.User; // ✅ ADD THIS
+import com.company.leave_management_system.entity.User;
+import com.company.leave_management_system.repository.UserRepository;
 import com.company.leave_management_system.service.NotificationService;
-import com.company.leave_management_system.service.UserService; // ✅ ADD THIS
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,17 +16,19 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final UserService userService; // ✅ ADD THIS
+    private final UserRepository userRepository; // ✅ use repository instead
 
     @GetMapping
     public List<Notification> getMyNotifications(Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return notificationService.getUserNotifications(user);
     }
 
     @GetMapping("/unread-count")
     public Long getUnreadCount(Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return notificationService.getUnreadCount(user);
     }
 
