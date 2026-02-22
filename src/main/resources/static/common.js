@@ -237,6 +237,103 @@ function updateNavbarUser() {
     }
 }
 
+// ===============================
+// Notifications
+// ===============================
+
+async function loadNotifications() {
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const response = await fetch("/api/notifications", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (!response.ok) return;
+
+    const notifications = await response.json();
+
+    const list = document.getElementById("notificationList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    if (notifications.length === 0) {
+        list.innerHTML =
+            `<li class="dropdown-item text-center text-muted">
+                No notifications
+             </li>`;
+        return;
+    }
+
+    notifications.forEach(n => {
+
+        const li = document.createElement("li");
+        li.className = "dropdown-item";
+
+        if (!n.read) {
+            li.style.fontWeight = "bold";
+        }
+
+        li.innerHTML = `
+            ${n.message}
+            <br>
+            <small class="text-muted">
+                ${new Date(n.createdAt).toLocaleString()}
+            </small>
+        `;
+
+        li.onclick = () => markAsRead(n.id);
+
+        list.appendChild(li);
+    });
+}
+
+async function loadUnreadCount() {
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const response = await fetch("/api/notifications/unread-count", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (!response.ok) return;
+
+    const count = await response.text();
+
+    const badge = document.getElementById("notificationCount");
+    if (badge) {
+        badge.innerText = count;
+        badge.style.display = count > 0 ? "inline" : "none";
+    }
+}
+
+async function markAsRead(id) {
+
+    const token = localStorage.getItem("token");
+
+    await fetch(`/api/notifications/${id}/read`, {
+        method: "PUT",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    loadNotifications();
+    loadUnreadCount();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadNotifications();
+    loadUnreadCount();
+});
+
 // Update session activity on user interactions
 document.addEventListener('click', updateSessionActivity);
 document.addEventListener('keypress', updateSessionActivity);
@@ -257,3 +354,4 @@ setInterval(() => {
     }
 
 }, 120000); // Check every 2 minutes
+
