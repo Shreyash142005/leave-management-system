@@ -39,6 +39,7 @@ public class LeaveRequestService {
     private final LeaveBalanceService leaveBalanceService;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Value("${app.leave.max-auto-approvals-per-month:2}")
     private int maxAutoApprovalsPerMonth;
@@ -378,4 +379,5 @@ public class LeaveRequestService {
                 .canCancel(canCancel)
                 .build();
     }
+
 }
