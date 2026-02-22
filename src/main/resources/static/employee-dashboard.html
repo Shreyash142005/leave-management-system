@@ -14,9 +14,25 @@
             <h2>🏢 Leave Management</h2>
         </div>
         <div class="nav-user">
-            <span id="user-name">Welcome, Employee</span>
-            <button onclick="logout()" class="btn btn-secondary btn-sm">Logout</button>
+    <div class="notification-wrapper">
+        <span class="notification-bell" onclick="toggleNotifications()">
+            🔔
+            <span id="notificationCount" class="notification-badge">0</span>
+        </span>
+
+        <div id="notificationDropdown" class="notification-dropdown">
+            <div class="notification-header">
+                Notifications
+            </div>
+            <div id="notificationList">
+                <p class="loading">Loading...</p>
+            </div>
         </div>
+    </div>
+
+    <span id="user-name">Welcome, Employee</span>
+    <button onclick="logout()" class="btn btn-secondary btn-sm">Logout</button>
+</div>
     </div>
 </nav>
 
@@ -180,4 +196,5 @@
 <script src="common.js"></script>
 <script src="employee.js"></script>
 </body>
+
 </html>
