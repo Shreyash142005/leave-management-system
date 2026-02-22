@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.company.leave_management_system.service.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -132,11 +133,11 @@ public class LeaveRequestService {
         leave.setProcessedBy(currentUser);
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
-        notificationService.createNotification(
-        leave.getEmployee().getUser(),
-        "Your leave request from " + leave.getStartDate() +
-        " to " + leave.getEndDate() + " has been rejected."
-        );
+       notificationService.createNotification(
+    leave.getEmployee().getUser(),
+    "Your leave request from " + leave.getStartDate() +
+    " to " + leave.getEndDate() + " has been approved."
+);
 
         // Send approval email
         emailService.sendLeaveApprovedEmail(updated);
@@ -182,9 +183,10 @@ public class LeaveRequestService {
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
         notificationService.createNotification(
-        leave.getProcessedBy() != null ? leave.getProcessedBy() : null,
-        currentEmployee.getName() + " has cancelled their leave request."
-        );
+    leave.getEmployee().getUser(),
+    "Your leave request from " + leave.getStartDate() +
+    " to " + leave.getEndDate() + " has been rejected."
+);
 
         // Restore leave balance
         int year = leave.getStartDate().getYear();
@@ -235,14 +237,18 @@ public class LeaveRequestService {
 
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
         // Notify all managers of the same department
-        List<User> managers = userRepository.findByRole(Role.MANAGER);
-        
-        for (User manager : managers) {
-            notificationService.createNotification(
-                    manager,
-                    "New leave request submitted by " + employee.getName()
-            );
-        }
+       List<User> managers = userRepository.findByRole(Role.MANAGER);
+
+for (User manager : managers) {
+    Employee managerEmployee = employeeService.getEmployeeByUserId(manager.getId());
+
+    if (managerEmployee.getDepartment().equals(employee.getDepartment())) {
+        notificationService.createNotification(
+            manager,
+            "New leave request submitted by " + employee.getName()
+        );
+    }
+}
         emailService.sendLeaveAppliedEmail(saved);
 
         return mapToResponseDTO(saved);
@@ -296,18 +302,22 @@ public class LeaveRequestService {
             throw new AccessDeniedException("You can only cancel your own leaves");
         }
 
-        if (leave.getStatus() != LeaveStatus.PENDING && leave.getStartDate().isBefore(LocalDate.now())) {
-            throw new InvalidLeaveRequestException(
-                    "You can only cancel pending leaves or leaves that haven't started yet");
-        }
+        if (!(leave.getStatus() == LeaveStatus.PENDING ||
+      (leave.getStatus() == LeaveStatus.APPROVED &&
+       leave.getStartDate().isAfter(LocalDate.now())))) {
+
+    throw new InvalidLeaveRequestException(
+        "You can only cancel pending leaves or approved leaves that haven't started yet"
+    );
+}
 
         leave.setStatus(LeaveStatus.CANCELLED);
         LeaveRequest updated = leaveRequestRepository.save(leave);
         notificationService.createNotification(
-        leave.getEmployee().getUser(),
-        "Your leave request from " + leave.getStartDate() +
-        " to " + leave.getEndDate() + " has been approved."
-        );
+    leave.getEmployee().getUser(),
+    "Your leave request from " + leave.getStartDate() +
+    " to " + leave.getEndDate() + " has been cancelled."
+);
 
         int year = leave.getStartDate().getYear();
         leaveBalanceService.restoreLeave(leave.getEmployee().getId(), leave.getWorkingDays(), year);
@@ -404,4 +414,5 @@ public class LeaveRequestService {
     }
 
 }
+
 
