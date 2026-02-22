@@ -1,6 +1,6 @@
 // auth.js - Authentication logic
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = '/api';
 
 // Check if already logged in
 if (localStorage.getItem('token')) {
@@ -89,4 +89,5 @@ function showError(message) {
     const errorEl = document.getElementById('login-error');
     errorEl.textContent = message;
     errorEl.style.display = 'block';
+
 }
