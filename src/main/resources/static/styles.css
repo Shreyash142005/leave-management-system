@@ -693,6 +693,62 @@ textarea {
     display: inline-block;
 }
 
+.notification-wrapper {
+    position: relative;
+    margin-right: 20px;
+}
+
+.notification-bell {
+    cursor: pointer;
+    font-size: 20px;
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+.notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 35px;
+    width: 320px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.notification-header {
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+}
+
+.notification-item.unread {
+    font-weight: bold;
+    background-color: #f8f9ff;
+}
+
+.notification-item:hover {
+    background-color: #f1f1f1;
+}
 /* ===================================
    RESPONSIVE DESIGN
    =================================== */
@@ -751,4 +807,5 @@ textarea {
     .year-end-options {
         grid-template-columns: 1fr;
     }
+
 }
