@@ -1,6 +1,6 @@
 // common.js - Shared utilities and functions
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = '/api';
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 /**
@@ -255,4 +255,5 @@ setInterval(() => {
             logout();
         }
     }
+
 }, 120000); // Check every 2 minutes
